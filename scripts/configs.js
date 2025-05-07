@@ -51,7 +51,15 @@ const getConfigForEnvironment = async (environment) => {
     if (!configJSON.ok) {
       throw new Error(`Failed to fetch config for ${env}`);
     }
-    configJSON = await configJSON.text();
+    const fullConfig = await configJSON.json();
+    
+    // Check if environment exists in the config
+    if (!fullConfig[env]) {
+      throw new Error(`Environment ${env} not found in config`);
+    }
+    
+    // Get the environment specific data
+    configJSON = JSON.stringify(fullConfig[env]);
     window.sessionStorage.setItem(`config:${env}`, configJSON);
   }
   return configJSON;
